@@ -1,5 +1,14 @@
+const express = require('express');
+const app = express();
 const oracledb = require('oracledb');
 require('dotenv').config();
+const path = require('path');
+const ejsMate = require('ejs-mate');
+
+app.engine('ejs', ejsMate);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 
 try {
     oracledb.initOracleClient({libDir: process.env.DB_FILEPATH});
@@ -25,10 +34,10 @@ async function run() {
         ]
 
         for (const s of stmts) {
-            await connection.execute(s);
+        //    await connection.execute(s);
         }
 
-        await connection.commit();
+        //await connection.commit();
 
         let result = await connection.execute("SELECT * FROM TESTTABLE");
         console.log(result);
@@ -51,3 +60,11 @@ async function run() {
 }
 
 run();
+
+app.get('/', (req, res) => {
+    res.render('home');
+})
+
+app.listen(3000, () => {
+    console.log('serving on port 3000');
+})
