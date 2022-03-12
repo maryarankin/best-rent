@@ -13,7 +13,13 @@
                 </li>
                 <li class="list-group-item">Population Rank: #<%= cityRow.population_rank %>
                 </li>
-                <li class="list-group-item">Metro Area: <%= cityRow.metro %>
+                <li class="list-group-item">Metro Area:
+                    <% if (cityRow.metro==null) { %>
+                        n/a
+                        <% } else { %>
+                            <%= cityRow.metro %>
+                                <% } %>
+
                 </li>
                 <li class="list-group-item">County: <%= cityRow.county %>
                 </li>
