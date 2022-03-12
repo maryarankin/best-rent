@@ -1,0 +1,30 @@
+<%- include('search') %>
+
+    </h1>
+    <div class="d-flex justify-content-center search-section">
+        <div class="card city-info">
+            <div class="card-header">
+                <h5>
+                    <%= cityRow.city_name %>
+                </h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">City Code: <%= cityRow.city_code %>
+                </li>
+                <li class="list-group-item">Population Rank: #<%= cityRow.population_rank %>
+                </li>
+                <li class="list-group-item">Metro Area: <%= cityRow.metro %>
+                </li>
+                <li class="list-group-item">County: <%= cityRow.county %>
+                </li>
+                <li class="list-group-item">State: <%= cityRow.state %>
+                </li>
+                <li class="list-group-item">Region: <%= cityRow.region %>
+                </li>
+            </ul>
+        </div>
+
+        <div class="graph mx-5">
+            <h1>GRAPH</h1>
+        </div>
+    </div>

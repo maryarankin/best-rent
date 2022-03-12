@@ -1,0 +1,53 @@
+<% layout('layout/boilerplate') %>
+
+    <div class="d-flex mx-5 mt-5">
+        <a href="/">Back to Home</a>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <div class="card db-info-card">
+            <div class="card-header db-info-header">
+                <h1 class="text-center db-info-title">Database Information</h1>
+            </div>
+            <div class="card-body">
+                <p class="text-center db-info-text">
+                    ~Info about database~
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center search-section">
+        <div class="row search-row">
+
+            <div class="col d-flex justify-content-center">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle dropdown-btn" type="button"
+                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Complex Queries
+                    </button>
+                    <ul class="dropdown-menu dropdown-options" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">Query 1</a></li>
+                        <li><a class="dropdown-item" href="#">Query 2</a></li>
+                        <li><a class="dropdown-item" href="#">Query 3</a></li>
+                        <li><a class="dropdown-item" href="#">Query 4</a></li>
+                        <li><a class="dropdown-item" href="#">Query 5</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col d-flex justify-content-center">
+                <form action="/search" method="POST">
+                    <div class="mb-3 d-inline-flex">
+                        <input type="text" class="form-control search-field" id="city" name="city"
+                            aria-describedby="city" placeholder="Search by city">
+                        <button type="submit" class="btn btn-primary search-btn">Search</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col">
+            </div>
+
+        </div>
+    </div>
