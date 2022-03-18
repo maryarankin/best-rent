@@ -112,3 +112,21 @@
 .city-info {
     width: 13%;
 }
+
+.query-section {
+    margin-top: 4%;
+}
+
+.query-selectors {
+    width: 30rem;
+}
+
+.added-locations-box {
+    background-color: #b1b1b1;
+}
+
+.query-graph {
+    width: 60%;
+    height: 30rem;
+    border: rgb(202, 202, 202) 0.1rem solid;
+}

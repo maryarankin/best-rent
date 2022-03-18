@@ -95,14 +95,13 @@ app.get('/search/:cityName', async (req, res) => {
     console.log(cityInfo)
 
     if (cityInfo.rows[0] === undefined) {
-        res.render('error');
+        let errorMsg = "City Not Found";
+        res.render('citySearchError', { errorMsg });
     }
 
     else {
 
     /* display >1 result if have same city name! */
-
-    /* what if metro is blank? */
 
     let cityRow = {
         city_code: cityInfo.rows[0][0],
@@ -116,6 +115,53 @@ app.get('/search/:cityName', async (req, res) => {
 
     res.render('city', { cityRow });
 }
+})
+
+app.get('/query1', (req, res) => {
+    let errorMsg = "";
+
+    res.render('query1', { errorMsg });
+})
+
+app.post('/query1', (req, res) => {
+    if (!req.body.city) {
+        let errorMsg = "Must enter a location";
+        res.redirect('query1', { errorMsg });
+    }
+
+    if (req.body.startingYear > req.body.endingYear) {
+        let errorMsg = "Starting year must be before ending year";
+        res.redirect('query1', { errorMsg });
+    }
+
+    res.redirect(`query1Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+})
+
+app.get('/query1Graph/:startingYear/:endingYear/:location', (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const querySelections = {
+        startingYear,
+        endingYear,
+        location
+    }
+    res.render('query1Graph', { querySelections });
+})
+
+app.get('/query2', (req, res) => {
+    res.render('query2');
+})
+
+app.get('/query3', (req, res) => {
+    res.render('query3');
+})
+
+app.get('/query4', (req, res) => {
+    res.render('query4');
+})
+
+app.get('/query5', (req, res) => {
+    res.render('query5');
 })
 
 app.listen(3000, () => {
