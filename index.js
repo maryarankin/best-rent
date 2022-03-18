@@ -5,6 +5,8 @@ require('dotenv').config();
 const path = require('path');
 const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
+const session = require('express-session');
+const flash = require('connect-flash');
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
@@ -12,6 +14,29 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+
+// SESSION
+const sessionConfig = {
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        //httpOnly: true,
+        //secure: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+
+app.use(session(sessionConfig));
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.event = req.flash('event');
+    next()
+})
 
 let connection;
 
@@ -125,13 +150,15 @@ app.get('/query1', (req, res) => {
 
 app.post('/query1', (req, res) => {
     if (!req.body.city) {
-        let errorMsg = "Must enter a location";
-        res.redirect('query1', { errorMsg });
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query1');
+        return;
     }
 
     if (req.body.startingYear > req.body.endingYear) {
-        let errorMsg = "Starting year must be before ending year";
-        res.redirect('query1', { errorMsg });
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query1');
+        return;
     }
 
     res.redirect(`query1Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
