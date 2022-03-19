@@ -22,7 +22,10 @@
                     <div class="card-body">
                         <%- include('./flash') %>
                             <h5 class="card-title text-center">Price Per Square Foot Over Time</h5>
-                            <p class="card-text">~Description of query~</p>
+                            <p class="card-text my-4">Search by location to view a scatterplot of how price per square
+                                foot has
+                                changed
+                                over a range of years</p>
 
                             <form action="/query1" method="POST">
                                 <div class="mb-3">
@@ -56,9 +59,9 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckDefault">
-                                    <label class="form-check-label" for="flexSwitchCheckDefault">See full range</label>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="fullRange">
+                                    <label class="form-check-label" for="fullRange">See full range of
+                                        years</label>
                                 </div>
 
                                 <div class="mb-3">

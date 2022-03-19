@@ -21,10 +21,11 @@
                 <div class="card query-selectors">
                     <div class="card-body">
                         <%- include('./flash') %>
-                            <h5 class="card-title text-center">Query 3</h5>
-                            <p class="card-text">~Description of query~</p>
+                            <h5 class="card-title text-center">Highest Change in Rent Per Year</h5>
+                            <p class="card-text my-4">Search over a range of years to view the cities with the highest
+                                rent increase per year in a histogram</p>
 
-                            <form action="/query1" method="POST">
+                            <form action="/query3" method="POST">
                                 <div class="mb-3">
                                     <label for="startingYear" class="form-label">Starting Year</label>
                                     <select class="form-select" aria-label="startingYear" id="startingYear"
@@ -56,29 +57,17 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckDefault">
-                                    <label class="form-check-label" for="flexSwitchCheckDefault">See full range</label>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="fullRange">
+                                    <label class="form-check-label" for="fullRange">See full range of years</label>
                                 </div>
 
-                                <div class="mb-3">
-                                    <div>
-                                        <label for="city" class="form-label">City</label>
-                                    </div>
-                                    <div class="d-inline-flex">
-                                        <input type="text" class="form-control" id="city" name="city"
-                                            aria-describedby="city">
-                                        <button type="submit" class="btn btn-primary mx-3">Add</button>
-                                    </div>
+                                <div class="form-check form-switch mb-5">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="monthly">
+                                    <label class="form-check-label" for="monthly">Include monthly
+                                        data</label>
                                 </div>
 
-                                <div class="card added-locations-box mt-5">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-center">Added Locations</h5>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary mt-5">Graph Query</button>
+                                <button type="submit" class="btn btn-primary">Graph Query</button>
                             </form>
                     </div>
                 </div>

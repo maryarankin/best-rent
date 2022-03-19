@@ -21,10 +21,11 @@
                 <div class="card query-selectors">
                     <div class="card-body">
                         <%- include('./flash') %>
-                            <h5 class="card-title text-center">Query 5</h5>
-                            <p class="card-text">~Description of query~</p>
+                            <h5 class="card-title text-center">Volatility in Rent</h5>
+                            <p class="card-text">Search by city over a range of years to view variance in rent price in
+                                a line graph</p>
 
-                            <form action="/query1" method="POST">
+                            <form action="/query5" method="POST">
                                 <div class="mb-3">
                                     <label for="startingYear" class="form-label">Starting Year</label>
                                     <select class="form-select" aria-label="startingYear" id="startingYear"
@@ -56,9 +57,8 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckDefault">
-                                    <label class="form-check-label" for="flexSwitchCheckDefault">See full range</label>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="fullRange">
+                                    <label class="form-check-label" for="fullRange">See full range of years</label>
                                 </div>
 
                                 <div class="mb-3">
@@ -74,7 +74,7 @@
 
                                 <div class="card added-locations-box mt-5">
                                     <div class="card-body">
-                                        <h5 class="card-title text-center">Added Locations</h5>
+                                        <h5 class="card-title text-center">Added Cities</h5>
                                     </div>
                                 </div>
 
