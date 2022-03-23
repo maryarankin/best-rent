@@ -115,9 +115,8 @@ app.get('/search/:cityName', async (req, res) => {
 
     cityName = cityNameUppercase.join(" ");
 
-    let stmt = `SELECT * FROM city2 WHERE city_name='${cityName}'`;
+    let stmt = `SELECT * FROM akonate.city1 WHERE "City Name"='${cityName}'`;
     let cityInfo = await connection.execute(stmt);
-    console.log(cityInfo)
 
     if (cityInfo.rows[0] === undefined) {
         let errorMsg = "City Not Found";
