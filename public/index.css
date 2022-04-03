@@ -94,15 +94,6 @@
     width: 100%;
 }
 
-.search-field {
-    width: 30rem;
-}
-
-.search-btn {
-    margin-left: 1rem;
-    background-color: #006aff;
-}
-
 .graph {
     width: 30%;
     height: 30rem;

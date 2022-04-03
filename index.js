@@ -94,16 +94,12 @@ app.get('/', (req, res) => {
     res.render('home');
 })
 
-app.get('/search', (req, res) => {
-    res.render('search');
+//change to main query page
+app.get('/complexqueries', (req, res) => {
+    res.render('complexQueries');
 })
 
-app.post('/search', (req, res) => {
-    let cityName = req.body.city;
-
-    res.redirect(`search/${cityName}`);
-})
-
+//delete but keep as sample for querying db
 app.get('/search/:cityName', async (req, res) => {
     let { cityName } = req.params;
 
