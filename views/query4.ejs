@@ -21,31 +21,45 @@
                 <div class="card query-selectors">
                     <div class="card-body">
                         <%- include('./flash') %>
-                            <h5 class="card-title text-center">Cost Per Month by Region</h5>
-                            <p class="card-text">Search by region to view how rent tends to change over the course of a
-                                year in a line graph</p>
+                            <h5 class="card-title text-center">Typical Monthly Trends by City</h5>
+                            <p class="card-text">Search by city to view a line graph of how average rent price tends to
+                                change throughout the year.</p>
 
                             <form action="/query4" method="POST">
-                                <div class="mb-5">
-                                    <div>
-                                        <label for="region" class="form-label">Region</label>
-                                    </div>
-                                    <div class="d-inline-flex">
-                                        <input type="text" class="form-control" id="region" name="region"
-                                            aria-describedby="region">
-                                        <button type="submit" class="btn btn-primary mx-3">Add</button>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="startingYear" class="form-label">Starting Year</label>
+                                    <select class="form-select" aria-label="startingYear" id="startingYear"
+                                        name="startingYear">
+                                        <option value="2010">2010</option>
+                                        <option value="2011">2011</option>
+                                        <option value="2012">2012</option>
+                                        <option value="2013">2013</option>
+                                        <option value="2014">2014</option>
+                                        <option value="2015">2015</option>
+                                        <option value="2016">2016</option>
+                                        <option value="2017">2017</option>
+                                    </select>
                                 </div>
 
-                                <div class="card added-locations-box mb-5">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-center">Added Regions</h5>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="endingYear" class="form-label">Ending Year</label>
+                                    <select class="form-select" aria-label="endingYear" id="endingYear"
+                                        name="endingYear">
+                                        <option value="2010">2010</option>
+                                        <option value="2011">2011</option>
+                                        <option value="2012">2012</option>
+                                        <option value="2013">2013</option>
+                                        <option value="2014">2014</option>
+                                        <option value="2015">2015</option>
+                                        <option value="2016">2016</option>
+                                        <option value="2017">2017</option>
+                                    </select>
                                 </div>
 
-                                <div class="form-check form-switch mb-5">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="seeAll">
-                                    <label class="form-check-label" for="seeAll">See all regions</label>
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city"
+                                        aria-describedby="city">
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Graph Query</button>

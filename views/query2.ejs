@@ -21,27 +21,11 @@
                 <div class="card query-selectors">
                     <div class="card-body">
                         <%- include('./flash') %>
-                            <h5 class="card-title text-center">Cities Ranked</h5>
-                            <p class="card-text my-4">Search over a range of years to view the highest or lowest cost
-                                cities in a bar graph</p>
+                            <h5 class="card-title text-center">Average Rent Price Per Square Foot by State</h5>
+                            <p class="card-text my-4">Search by state to view a bar graph of average rent prices per
+                                square foot over a range of years.</p>
 
                             <form action="/query2" method="POST">
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="sort" id="highestCost">
-                                        <label class="form-check-label" for="highestCost">
-                                            View highest cost
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="sort" id="lowestCost"
-                                            checked>
-                                        <label class="form-check-label" for="lowestCost">
-                                            View lowest cost
-                                        </label>
-                                    </div>
-                                </div>
-
                                 <div class="mb-3">
                                     <label for="startingYear" class="form-label">Starting Year</label>
                                     <select class="form-select" aria-label="startingYear" id="startingYear"
@@ -72,22 +56,10 @@
                                     </select>
                                 </div>
 
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="fullRange">
-                                    <label class="form-check-label" for="fullRange">See full range of
-                                        years</label>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label for="numResults" class="form-label">Number of Cities</label>
-                                    <select class="form-select" aria-label="numResults" id="numResults"
-                                        name="numResults">
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
+                                <div class="mb-3">
+                                    <label for="state" class="form-label">State</label>
+                                    <input type="text" class="form-control" id="state" name="state"
+                                        aria-describedby="state">
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Graph Query</button>

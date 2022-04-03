@@ -21,9 +21,9 @@
                 <div class="card query-selectors">
                     <div class="card-body">
                         <%- include('./flash') %>
-                            <h5 class="card-title text-center">Volatility in Rent</h5>
-                            <p class="card-text">Search by city over a range of years to view variance in rent price in
-                                a line graph</p>
+                            <h5 class="card-title text-center">Average Square Footage Per Year by City</h5>
+                            <p class="card-text">Search by city to view a line graph of average square footage over a
+                                range of years.</p>
 
                             <form action="/query5" method="POST">
                                 <div class="mb-3">
@@ -56,29 +56,13 @@
                                     </select>
                                 </div>
 
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="fullRange">
-                                    <label class="form-check-label" for="fullRange">See full range of years</label>
-                                </div>
-
                                 <div class="mb-3">
-                                    <div>
-                                        <label for="city" class="form-label">City</label>
-                                    </div>
-                                    <div class="d-inline-flex">
-                                        <input type="text" class="form-control" id="city" name="city"
-                                            aria-describedby="city">
-                                        <button type="submit" class="btn btn-primary mx-3">Add</button>
-                                    </div>
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city"
+                                        aria-describedby="city">
                                 </div>
 
-                                <div class="card added-locations-box mt-5">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-center">Added Cities</h5>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary mt-5">Graph Query</button>
+                                <button type="submit" class="btn btn-primary">Graph Query</button>
                             </form>
                     </div>
                 </div>

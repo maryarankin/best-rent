@@ -142,9 +142,7 @@ app.get('/search/:cityName', async (req, res) => {
 })
 
 app.get('/query1', (req, res) => {
-    let errorMsg = "";
-
-    res.render('query1', { errorMsg });
+    res.render('query1');
 })
 
 app.post('/query1', (req, res) => {
@@ -178,16 +176,124 @@ app.get('/query2', (req, res) => {
     res.render('query2');
 })
 
+app.post('/query2', (req, res) => {
+    if (!req.body.state) {
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query2');
+        return;
+    }
+
+    if (req.body.startingYear > req.body.endingYear) {
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query2');
+        return;
+    }
+
+    res.redirect(`query2Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.state}`);
+})
+
+app.get('/query2Graph/:startingYear/:endingYear/:location', (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const querySelections = {
+        startingYear,
+        endingYear,
+        location
+    }
+    res.render('query2Graph', { querySelections });
+})
+
 app.get('/query3', (req, res) => {
     res.render('query3');
+})
+
+app.post('/query3', (req, res) => {
+    if (!req.body.region) {
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query3');
+        return;
+    }
+
+    if (req.body.startingYear > req.body.endingYear) {
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query3');
+        return;
+    }
+
+    res.redirect(`query3Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.region}`);
+})
+
+app.get('/query3Graph/:startingYear/:endingYear/:location', (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const querySelections = {
+        startingYear,
+        endingYear,
+        location
+    }
+    res.render('query3Graph', { querySelections });
 })
 
 app.get('/query4', (req, res) => {
     res.render('query4');
 })
 
+app.post('/query4', (req, res) => {
+    if (!req.body.city) {
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query4');
+        return;
+    }
+
+    if (req.body.startingYear > req.body.endingYear) {
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query4');
+        return;
+    }
+
+    res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+})
+
+app.get('/query4Graph/:startingYear/:endingYear/:location', (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const querySelections = {
+        startingYear,
+        endingYear,
+        location
+    }
+    res.render('query4Graph', { querySelections });
+})
+
 app.get('/query5', (req, res) => {
     res.render('query5');
+})
+
+app.post('/query5', (req, res) => {
+    if (!req.body.city) {
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query5');
+        return;
+    }
+
+    if (req.body.startingYear > req.body.endingYear) {
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query5');
+        return;
+    }
+
+    res.redirect(`query5Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+})
+
+app.get('/query5Graph/:startingYear/:endingYear/:location', (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const querySelections = {
+        startingYear,
+        endingYear,
+        location
+    }
+    res.render('query5Graph', { querySelections });
 })
 
 app.listen(3000, () => {
