@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/maryarankin/best-rent#readme",
   "dependencies": {
+    "chart.js": "^3.7.1",
     "connect-flash": "^0.1.1",
     "dotenv": "^16.0.0",
     "ejs-mate": "^3.0.0",
