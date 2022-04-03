@@ -1,56 +1,62 @@
 <%- include('query1') %>
 
     <div class="col-8 d-flex justify-content-center">
-        <div class="query-graph mx-5">
-            <h1>GRAPH</h1>
-            <h2>
-                <%= querySelections.location %>
-            </h2>
-            <h3>
-                <%= querySelections.startingYear %> to <%= querySelections.endingYear %>
-            </h3>
+        <div class="chart-container" style="position: relative; height:30vh; width:40vw">
+            <canvas id="myChart"></canvas>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            let yearsArray = '<%= years %>'.split(',');
+            let dataArray = '<%= avgRent %>'.split(',');
+
+            const data = {
+                labels: yearsArray,
+                datasets: [{
+                    label: '<%= location %>',
+                    backgroundColor: 'rgb(0, 106, 255)',
+                    borderColor: 'rgb(0, 106, 255)',
+                    data: dataArray,
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Average Rent Price Per Year in <%= location %>'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Average Rent Price'
+                            }
+                        }
+                    }
+                }
+            };
+        </script>
+
+        <script>
+            const myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+        </script>
     </div>
 
     </div>
     </div>
-
-
-
-    <div>
-        <canvas id="myChart"></canvas>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const labels = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-        ];
-
-        const data = {
-            labels: labels,
-            datasets: [{
-                label: 'My First dataset',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30, 45],
-            }]
-        };
-
-        const config = {
-            type: 'line',
-            data: data,
-            options: {}
-        };
-    </script>
-
-    <script>
-        const myChart = new Chart(
-            document.getElementById('myChart'),
-            config
-        );
-    </script>
