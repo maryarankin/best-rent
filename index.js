@@ -7,6 +7,7 @@ const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
+const { orderMonths } = require('./orderMonths')
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
@@ -217,15 +218,8 @@ app.post('/query2', (req, res) => {
     res.redirect(`query2Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.state}`);
 })
 
-app.get('/query2Graph/:startingYear/:endingYear/:location', (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
-
-    const querySelections = {
-        startingYear,
-        endingYear,
-        location
-    }
-    res.render('query2Graph', { querySelections });
+app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => {
+    
 })
 
 app.get('/query3', (req, res) => {
@@ -279,15 +273,44 @@ app.post('/query4', (req, res) => {
     res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
 })
 
-app.get('/query4Graph/:startingYear/:endingYear/:location', (req, res) => {
+app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => {
     let { startingYear, endingYear, location } = req.params;
 
-    const querySelections = {
-        startingYear,
-        endingYear,
-        location
+    const locationUppercase = location.split(" ");
+
+    for (let i = 0; i < locationUppercase.length; i++) {
+        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
     }
-    res.render('query4Graph', { querySelections });
+
+    location = locationUppercase.join(" ");
+
+    let stmt = `SELECT AVG(r.price), r.month FROM akonate.rent r NATURAL JOIN akonate.city1 c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
+
+    let cityInfo = await connection.execute(stmt);
+    
+    if (cityInfo.rows[0] === undefined) {
+        req.flash('error', 'City or Years Not Found');
+        res.redirect('/query4');
+        return;
+    }
+    else {
+        /* display >1 result if have same city name! */
+
+        const months = [];
+        const avgRent = [];
+
+        for (let i = 0; i < cityInfo.rows.length; i++) {
+            months.push(cityInfo.rows[i][1]);
+            avgRent.push(cityInfo.rows[i][0]);
+        }
+
+        const monthsAndRent = [months, avgRent];
+        const monthsAndRentInOrder = orderMonths(monthsAndRent);
+        const monthsInOrder = monthsAndRentInOrder[0];
+        const avgRentInOrder = monthsAndRentInOrder[1];
+
+        res.render('query4Graph', { location, monthsInOrder, avgRentInOrder, startingYear, endingYear });
+    }
 })
 
 app.get('/query5', (req, res) => {
