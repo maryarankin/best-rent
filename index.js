@@ -203,12 +203,6 @@ app.get('/query2', (req, res) => {
 })
 
 app.post('/query2', (req, res) => {
-    if (!req.body.state) {
-        req.flash('error', 'Must enter a location');
-        res.redirect('/query2');
-        return;
-    }
-
     if (req.body.startingYear > req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query2');
@@ -219,7 +213,43 @@ app.post('/query2', (req, res) => {
 })
 
 app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => {
+    let { startingYear, endingYear, location } = req.params;
+
+    const locationUppercase = location.split(" ");
+
+    for (let i = 0; i < locationUppercase.length; i++) {
+        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
+    }
+
+    location = locationUppercase.join(" ");
+
+    let stmt = `SELECT AVG(r.price), r.year FROM akonate.rent_per_sq_ft r NATURAL JOIN akonate.city1 c WHERE c."State"='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+
+    let cityInfo = await connection.execute(stmt);
     
+    if (cityInfo.rows[0] === undefined) {
+        req.flash('error', 'Data for Years Not Found');
+        res.redirect('/query2');
+        return;
+    }
+
+    else {
+
+        /* display >1 result if have same city name! */
+
+        const years = [];
+        const avgRent = [];
+
+        for (let i = 0; i < cityInfo.rows.length; i++) {
+            years.push(cityInfo.rows[i][1]);
+            avgRent.push(cityInfo.rows[i][0]);
+        }
+
+        console.log(years);
+        console.log(avgRent);
+
+        res.render('query2Graph', { location, years, avgRent });
+    }
 })
 
 app.get('/query3', (req, res) => {
@@ -333,15 +363,44 @@ app.post('/query5', (req, res) => {
     res.redirect(`query5Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
 })
 
-app.get('/query5Graph/:startingYear/:endingYear/:location', (req, res) => {
+app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => {
     let { startingYear, endingYear, location } = req.params;
 
-    const querySelections = {
-        startingYear,
-        endingYear,
-        location
+    const locationUppercase = location.split(" ");
+
+    for (let i = 0; i < locationUppercase.length; i++) {
+        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
     }
-    res.render('query5Graph', { querySelections });
+
+    location = locationUppercase.join(" ");
+
+    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM akonate.rent_per_sq_ft rpsf, akonate.rent r, akonate.city1 c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+
+    let cityInfo = await connection.execute(stmt);
+    
+    if (cityInfo.rows[0] === undefined) {
+        req.flash('error', 'City or Years Not Found');
+        res.redirect('/query5');
+        return;
+    }
+
+    else {
+
+        /* display >1 result if have same city name! */
+
+        const years = [];
+        const avgSqFt = [];
+
+        for (let i = 0; i < cityInfo.rows.length; i++) {
+            years.push(cityInfo.rows[i][1]);
+            avgSqFt.push(cityInfo.rows[i][0]);
+        }
+
+        console.log(years);
+        console.log(avgSqFt);
+
+        res.render('query5Graph', { location, years, avgSqFt });
+    }
 })
 
 app.listen(3000, () => {
