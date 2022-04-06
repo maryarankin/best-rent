@@ -149,7 +149,9 @@ app.post('/query1', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear) {
+
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query1');
         return;
@@ -169,7 +171,7 @@ app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM rent r NATURAL JOIN city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -200,7 +202,8 @@ app.get('/query2', (req, res) => {
 })
 
 app.post('/query2', (req, res) => {
-    if (req.body.startingYear > req.body.endingYear) {
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query2');
         return;
@@ -220,7 +223,7 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM rent_per_sq_ft r NATURAL JOIN city c WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent_per_sq_ft r NATURAL JOIN maryrankin.city c WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let stateInfo = await connection.execute(stmt);
     
@@ -248,7 +251,8 @@ app.get('/query3', (req, res) => {
 })
 
 app.post('/query3', (req, res) => {
-    if (req.body.startingYear > req.body.endingYear) {
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query3');
         return;
@@ -268,7 +272,7 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM rent r NATURAL JOIN city c WHERE c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM rent r NATURAL JOIN city c WHERE c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
+    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
 
     let regionInfo = await connection.execute(stmt);
     
@@ -301,7 +305,8 @@ app.post('/query4', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear) {
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query4');
         return;
@@ -321,7 +326,7 @@ app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.month FROM rent r NATURAL JOIN city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
+    let stmt = `SELECT AVG(r.price), r.month FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -361,7 +366,8 @@ app.post('/query5', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear) {
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query5');
         return;
@@ -381,7 +387,7 @@ app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM rent_per_sq_ft rpsf, rent r, city c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
