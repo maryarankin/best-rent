@@ -268,7 +268,7 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM rent r, city c WHERE r.city_code = c.city_code AND c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM rent r, city c WHERE r.city_code = c.city_code AND c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
+    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM rent r NATURAL JOIN city c WHERE c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM rent r NATURAL JOIN city c WHERE c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
 
     let regionInfo = await connection.execute(stmt);
     
@@ -285,9 +285,6 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => 
             years.push(regionInfo.rows[i][1]);
             change.push(regionInfo.rows[i][0]);
         }
-
-        console.log(years);
-        console.log(change);
 
         res.render('query3Graph', { location, years, change });
     }
