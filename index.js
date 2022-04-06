@@ -191,9 +191,6 @@ app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => 
             avgRent.push(cityInfo.rows[i][0]);
         }
 
-        console.log(years);
-        console.log(avgRent);
-
         res.render('query1Graph', { location, years, avgRent });
     }
 })
@@ -223,7 +220,7 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM rent_per_sq_ft r NATURAL JOIN city c WHERE c."State"='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM rent_per_sq_ft r NATURAL JOIN city c WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let stateInfo = await connection.execute(stmt);
     
@@ -241,9 +238,6 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
             years.push(stateInfo.rows[i][1]);
             avgRent.push(stateInfo.rows[i][0]);
         }
-
-        console.log(years);
-        console.log(avgRent);
 
         res.render('query2Graph', { location, years, avgRent });
     }
@@ -263,7 +257,7 @@ app.post('/query3', (req, res) => {
     res.redirect(`query3Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.region}`);
 })
 
-app.get('/query3Graph/:startingYear/:endingYear/:location', (req, res) => {
+app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => {
     let { startingYear, endingYear, location } = req.params;
 
     const locationUppercase = location.split(" ");
@@ -295,7 +289,7 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', (req, res) => {
         console.log(years);
         console.log(change);
 
-        res.render('query3Graph', { location, years, change, startingYear, endingYear });
+        res.render('query3Graph', { location, years, change });
     }
 })
 
@@ -411,9 +405,6 @@ app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => 
             years.push(cityInfo.rows[i][1]);
             avgSqFt.push(cityInfo.rows[i][0]);
         }
-
-        console.log(years);
-        console.log(avgSqFt);
 
         res.render('query5Graph', { location, years, avgSqFt });
     }
