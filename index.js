@@ -169,7 +169,7 @@ app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM akonate.rent r NATURAL JOIN akonate.city1 c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM rent r NATURAL JOIN city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -223,26 +223,23 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM akonate.rent_per_sq_ft r NATURAL JOIN akonate.city1 c WHERE c."State"='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM rent_per_sq_ft r NATURAL JOIN city c WHERE c."State"='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
-    let cityInfo = await connection.execute(stmt);
+    let stateInfo = await connection.execute(stmt);
     
-    if (cityInfo.rows[0] === undefined) {
-        req.flash('error', 'Data for Years Not Found');
+    if (stateInfo.rows[0] === undefined) {
+        req.flash('error', 'Data for These Years Not Found');
         res.redirect('/query2');
         return;
     }
 
     else {
-
-        /* display >1 result if have same city name! */
-
         const years = [];
         const avgRent = [];
 
-        for (let i = 0; i < cityInfo.rows.length; i++) {
-            years.push(cityInfo.rows[i][1]);
-            avgRent.push(cityInfo.rows[i][0]);
+        for (let i = 0; i < stateInfo.rows.length; i++) {
+            years.push(stateInfo.rows[i][1]);
+            avgRent.push(stateInfo.rows[i][0]);
         }
 
         console.log(years);
@@ -257,12 +254,6 @@ app.get('/query3', (req, res) => {
 })
 
 app.post('/query3', (req, res) => {
-    if (!req.body.region) {
-        req.flash('error', 'Must enter a location');
-        res.redirect('/query3');
-        return;
-    }
-
     if (req.body.startingYear > req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query3');
@@ -275,12 +266,37 @@ app.post('/query3', (req, res) => {
 app.get('/query3Graph/:startingYear/:endingYear/:location', (req, res) => {
     let { startingYear, endingYear, location } = req.params;
 
-    const querySelections = {
-        startingYear,
-        endingYear,
-        location
+    const locationUppercase = location.split(" ");
+
+    for (let i = 0; i < locationUppercase.length; i++) {
+        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
     }
-    res.render('query3Graph', { querySelections });
+
+    location = locationUppercase.join(" ");
+
+    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM rent r, city c WHERE r.city_code = c.city_code AND c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM rent r, city c WHERE r.city_code = c.city_code AND c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
+
+    let regionInfo = await connection.execute(stmt);
+    
+    if (regionInfo.rows[0] === undefined) {
+        req.flash('error', 'Data for These Years Not Found');
+        res.redirect('/query3');
+        return;
+    }
+    else {
+        const years = [];
+        const change = [];
+
+        for (let i = 0; i < regionInfo.rows.length; i++) {
+            years.push(regionInfo.rows[i][1]);
+            change.push(regionInfo.rows[i][0]);
+        }
+
+        console.log(years);
+        console.log(change);
+
+        res.render('query3Graph', { location, years, change, startingYear, endingYear });
+    }
 })
 
 app.get('/query4', (req, res) => {
@@ -314,7 +330,7 @@ app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.month FROM akonate.rent r NATURAL JOIN akonate.city1 c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
+    let stmt = `SELECT AVG(r.price), r.month FROM rent r NATURAL JOIN city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -374,7 +390,7 @@ app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM akonate.rent_per_sq_ft rpsf, akonate.rent r, akonate.city1 c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM rent_per_sq_ft rpsf, rent r, city c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
