@@ -12,7 +12,7 @@
             const data = {
                 labels: yearsArray,
                 datasets: [{
-                    label: '<%= location %>',
+                    label: '<%= city %>',
                     backgroundColor: 'rgb(0, 106, 255)',
                     borderColor: 'rgb(0, 106, 255)',
                     data: dataArray,
@@ -26,7 +26,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Average Rent Price Per Year in <%= location %>'
+                            text: 'Average Rent Price Per Year in <%= city %>, <%= state %>'
                         },
                         legend: {
                             display: false

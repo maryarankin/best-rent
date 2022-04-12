@@ -78,6 +78,16 @@
     font-size: 1.1rem;
 }
 
+.num-tuples-btn {
+    background-color: #1dca51;
+    color: #093a17;
+    font-size: 1.25rem;
+}
+
+.num-tuples-btn:hover {
+    background-color: #6bdb8c;
+}
+
 .dropdown-btn {
     width: 25rem;
 }

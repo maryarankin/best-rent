@@ -100,6 +100,17 @@ app.get('/complexqueries', (req, res) => {
     res.render('complexQueries');
 })
 
+app.get('/numtuples', async (req, res) => {
+    let stmt = `SELECT c_count + r_count + rpsf_count FROM (SELECT COUNT(*) AS c_count FROM maryrankin.city), (SELECT COUNT(*) AS r_count FROM maryrankin.rent), (SELECT COUNT(*) AS rpsf_count FROM maryrankin.rent_per_sq_ft)`;
+
+    let numTuplesInfo = await connection.execute(stmt);
+    let numTuples = numTuplesInfo.rows[0][0];
+
+    req.flash('success', `Total tuples in database: ${numTuples}`);
+    res.redirect('/complexqueries');
+    return;
+})
+
 //delete but keep as sample for querying db
 app.get('/search/:cityName', async (req, res) => {
     let { cityName } = req.params;
@@ -149,7 +160,6 @@ app.post('/query1', (req, res) => {
         return;
     }
 
-
     if (req.body.startingYear > req.body.endingYear ||
         req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
@@ -157,21 +167,21 @@ app.post('/query1', (req, res) => {
         return;
     }
 
-    res.redirect(`query1Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+    res.redirect(`query1Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}/${req.body.state}`);
 })
 
-app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
+app.get('/query1Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
+    let { startingYear, endingYear, city, state } = req.params;
 
-    const locationUppercase = location.split(" ");
+    const cityUppercase = city.split(" ");
 
-    for (let i = 0; i < locationUppercase.length; i++) {
-        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
+    for (let i = 0; i < cityUppercase.length; i++) {
+        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
     }
 
-    location = locationUppercase.join(" ");
+    city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -182,9 +192,6 @@ app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => 
     }
 
     else {
-
-        /* display >1 result if have same city name! */
-
         const years = [];
         const avgRent = [];
 
@@ -193,7 +200,7 @@ app.get('/query1Graph/:startingYear/:endingYear/:location', async (req, res) => 
             avgRent.push(cityInfo.rows[i][0]);
         }
 
-        res.render('query1Graph', { location, years, avgRent });
+        res.render('query1Graph', { city, state, years, avgRent });
     }
 })
 
