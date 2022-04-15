@@ -252,21 +252,21 @@ app.post('/query4', (req, res) => {
         return;
     }
 
-    res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+    res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}/${req.body.state}`);
 })
 
-app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
+app.get('/query4Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
+    let { startingYear, endingYear, city, state } = req.params;
 
-    const locationUppercase = location.split(" ");
+    const cityUppercase = city.split(" ");
 
-    for (let i = 0; i < locationUppercase.length; i++) {
-        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
+    for (let i = 0; i < cityUppercase.length; i++) {
+        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
     }
 
-    location = locationUppercase.join(" ");
+    city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.month FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
+    let stmt = `SELECT AVG(r.price), r.month FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -276,8 +276,6 @@ app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => 
         return;
     }
     else {
-        /* display >1 result if have same city name! */
-
         const months = [];
         const avgRent = [];
 
@@ -291,7 +289,7 @@ app.get('/query4Graph/:startingYear/:endingYear/:location', async (req, res) => 
         const monthsInOrder = monthsAndRentInOrder[0];
         const avgRentInOrder = monthsAndRentInOrder[1];
 
-        res.render('query4Graph', { location, monthsInOrder, avgRentInOrder, startingYear, endingYear });
+        res.render('query4Graph', { city, state, monthsInOrder, avgRentInOrder, startingYear, endingYear });
     }
 })
 
@@ -313,21 +311,21 @@ app.post('/query5', (req, res) => {
         return;
     }
 
-    res.redirect(`query5Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}`);
+    res.redirect(`query5Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}/${req.body.state}`);
 })
 
-app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
+app.get('/query5Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
+    let { startingYear, endingYear, city, state } = req.params;
 
-    const locationUppercase = location.split(" ");
+    const cityUppercase = city.split(" ");
 
-    for (let i = 0; i < locationUppercase.length; i++) {
-        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
+    for (let i = 0; i < cityUppercase.length; i++) {
+        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
     }
 
-    location = locationUppercase.join(" ");
+    city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c WHERE c.city_name='${location}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -338,9 +336,6 @@ app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => 
     }
 
     else {
-
-        /* display >1 result if have same city name! */
-
         const years = [];
         const avgSqFt = [];
 
@@ -349,7 +344,7 @@ app.get('/query5Graph/:startingYear/:endingYear/:location', async (req, res) => 
             avgSqFt.push(cityInfo.rows[i][0]);
         }
 
-        res.render('query5Graph', { location, years, avgSqFt });
+        res.render('query5Graph', { city, state, years, avgSqFt });
     }
 })
 
