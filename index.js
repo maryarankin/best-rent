@@ -114,7 +114,11 @@ app.get('/query1Graph/:startingYear/:endingYear/:city/:state', async (req, res) 
 
     city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year 
+    FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
+    WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
+    GROUP BY r.year 
+    ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -163,7 +167,11 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.year FROM maryrankin.rent_per_sq_ft r NATURAL JOIN maryrankin.city c WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price), r.year 
+    FROM maryrankin.rent_per_sq_ft r NATURAL JOIN maryrankin.city c 
+    WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
+    GROUP BY r.year 
+    ORDER BY r.year ASC`;
 
     let stateInfo = await connection.execute(stmt);
     
@@ -212,7 +220,18 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => 
 
     location = locationUppercase.join(" ");
 
-    let stmt = `SELECT dp - jp, j.year FROM (SELECT AVG(r.price) AS jp, r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.region='${location}' AND r.month='Jan' GROUP BY r.year) j, (SELECT AVG(r.price) AS dp, r.year FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.region='${location}' AND r.month='Dec' GROUP BY r.year) d WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} ORDER BY j.year`;
+    let stmt = `SELECT dp - jp, j.year 
+    FROM 
+        (SELECT AVG(r.price) AS jp, r.year 
+        FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
+        WHERE c.region='${location}' AND r.month='Jan' 
+        GROUP BY r.year) j, 
+        (SELECT AVG(r.price) AS dp, r.year 
+        FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
+        WHERE c.region='${location}' AND r.month='Dec' 
+        GROUP BY r.year) d 
+    WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} 
+    ORDER BY j.year`;
 
     let regionInfo = await connection.execute(stmt);
     
@@ -266,7 +285,11 @@ app.get('/query4Graph/:startingYear/:endingYear/:city/:state', async (req, res) 
 
     city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price), r.month FROM maryrankin.rent r NATURAL JOIN maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.month ORDER BY r.month ASC`;
+    let stmt = `SELECT AVG(r.price), r.month 
+    FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
+    WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
+    GROUP BY r.month 
+    ORDER BY r.month ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -325,7 +348,11 @@ app.get('/query5Graph/:startingYear/:endingYear/:city/:state', async (req, res) 
 
     city = cityUppercase.join(" ");
 
-    let stmt = `SELECT AVG(r.price / rpsf.price), r.year FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c WHERE c.city_name='${city}' AND c.cstate='${state}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} GROUP BY r.year ORDER BY r.year ASC`;
+    let stmt = `SELECT AVG(r.price / rpsf.price), r.year 
+    FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c 
+    WHERE c.city_name='${city}' AND c.cstate='${state}' AND c.city_code = r.city_code AND r.city_code = rpsf.city_code AND r.month = rpsf.month AND r.year = rpsf.year AND r.year BETWEEN ${startingYear} AND ${endingYear} 
+    GROUP BY r.year 
+    ORDER BY r.year ASC`;
 
     let cityInfo = await connection.execute(stmt);
     
@@ -345,6 +372,82 @@ app.get('/query5Graph/:startingYear/:endingYear/:city/:state', async (req, res) 
         }
 
         res.render('query5Graph', { city, state, years, avgSqFt });
+    }
+})
+
+app.get('/query6', (req, res) => {
+    res.render('query6');
+})
+
+app.post('/query6', (req, res) => {
+    if (!req.body.city) {
+        req.flash('error', 'Must enter a location');
+        res.redirect('/query6');
+        return;
+    }
+
+    if (req.body.startingYear > req.body.endingYear ||
+        req.body.startingYear == req.body.endingYear) {
+        req.flash('error', 'Starting year must be before ending year');
+        res.redirect('/query6');
+        return;
+    }
+
+    res.redirect(`query6Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}/${req.body.state}`);
+})
+
+app.get('/query6Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
+    let { startingYear, endingYear, city, state } = req.params;
+
+    const cityUppercase = city.split(" ");
+
+    for (let i = 0; i < cityUppercase.length; i++) {
+        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
+    }
+
+    city = cityUppercase.join(" ");
+
+    let stmt = `SELECT AVG(r.price), r.year, c.city_name, c.county
+    FROM maryrankin.rent r NATURAL JOIN maryrankin.city c
+    WHERE city_code =
+        (SELECT cheapest_city
+        FROM 
+            (SELECT AVG(r1.price) AS avg_price1, city_code AS cheapest_city, c1.county AS c1_county
+            FROM maryrankin.rent r1 NATURAL JOIN maryrankin.city c1
+            WHERE r1.year BETWEEN ${startingYear} AND ${endingYear} AND c1.cstate='${state}'
+            GROUP BY city_code, c1.county),
+            (SELECT AVG(r2.price) AS avg_price2, c2.county AS c2_county
+            FROM maryrankin.rent r2 NATURAL JOIN maryrankin.city c2 
+            WHERE c2.city_name='${city}' AND c2.cstate='${state}' AND r2.year BETWEEN ${startingYear} AND ${endingYear}
+            GROUP BY c2.county)
+        WHERE avg_price1 <= avg_price2 AND c1_county = c2_county
+        ORDER BY avg_price1 ASC
+        FETCH FIRST 1 ROWS ONLY)
+    AND r.year BETWEEN 2010 and 2017
+    GROUP BY r.year, c.city_name, c.county
+    ORDER BY r.year ASC`;
+
+    let cityInfo = await connection.execute(stmt);
+    
+    if (cityInfo.rows[0] === undefined) {
+        req.flash('error', 'City or Years Not Found');
+        res.redirect('/query6');
+        return;
+    }
+
+    else {
+        const years = [];
+        const avgRent = [];
+        let cheapestCity = cityInfo.rows[0][2];
+        cheapestCity = cheapestCity.replace('\'', '');
+        let county = cityInfo.rows[0][3];
+
+        for (let i = 0; i < cityInfo.rows.length; i++) {
+            years.push(cityInfo.rows[i][1]);
+            avgRent.push(cityInfo.rows[i][0]);
+        }
+
+        res.render('query6Graph', { city, state, county, cheapestCity, years, avgRent });
     }
 })
 
