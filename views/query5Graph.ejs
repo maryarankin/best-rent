@@ -20,7 +20,7 @@
             };
 
             const config = {
-                type: 'scatter',
+                type: 'line',
                 data: data,
                 options: {
                     plugins: {
@@ -37,12 +37,6 @@
                             title: {
                                 display: true,
                                 text: 'Year'
-                            },
-                            ticks: {
-                                callback: function (value, index, ticks) {
-                                    return value.toString();
-                                },
-                                stepSize: 1
                             }
                         },
                         y: {

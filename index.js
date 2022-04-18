@@ -109,8 +109,7 @@ app.post('/query1', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query1');
         return;
@@ -156,8 +155,7 @@ app.get('/query2', (req, res) => {
 })
 
 app.post('/query2', (req, res) => {
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query2');
         return;
@@ -201,8 +199,7 @@ app.get('/query3', (req, res) => {
 })
 
 app.post('/query3', (req, res) => {
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query3');
         return;
@@ -252,8 +249,7 @@ app.get('/query4', (req, res) => {
 })
 
 app.post('/query4', (req, res) => {
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query4');
         return;
@@ -331,8 +327,7 @@ app.post('/query5', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query5');
         return;
@@ -384,8 +379,7 @@ app.post('/query6', (req, res) => {
         return;
     }
 
-    if (req.body.startingYear > req.body.endingYear ||
-        req.body.startingYear == req.body.endingYear) {
+    if (req.body.startingYear >= req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
         res.redirect('/query6');
         return;
