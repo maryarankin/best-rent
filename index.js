@@ -7,7 +7,6 @@ const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
-const { orderMonths } = require('./orderMonths')
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
@@ -156,20 +155,12 @@ app.post('/query2', (req, res) => {
     res.redirect(`query2Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.state}`);
 })
 
-app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
-
-    const locationUppercase = location.split(" ");
-
-    for (let i = 0; i < locationUppercase.length; i++) {
-        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
-    }
-
-    location = locationUppercase.join(" ");
+app.get('/query2Graph/:startingYear/:endingYear/:state', async (req, res) => {
+    let { startingYear, endingYear, state } = req.params;
 
     let stmt = `SELECT AVG(r.price), r.year 
     FROM maryrankin.rent_per_sq_ft r NATURAL JOIN maryrankin.city c 
-    WHERE c.cstate='${location}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
+    WHERE c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
     GROUP BY r.year 
     ORDER BY r.year ASC`;
 
@@ -190,7 +181,7 @@ app.get('/query2Graph/:startingYear/:endingYear/:location', async (req, res) => 
             avgRent.push(stateInfo.rows[i][0]);
         }
 
-        res.render('query2Graph', { location, years, avgRent });
+        res.render('query2Graph', { state, years, avgRent });
     }
 })
 
@@ -209,26 +200,18 @@ app.post('/query3', (req, res) => {
     res.redirect(`query3Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.region}`);
 })
 
-app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => {
-    let { startingYear, endingYear, location } = req.params;
-
-    const locationUppercase = location.split(" ");
-
-    for (let i = 0; i < locationUppercase.length; i++) {
-        locationUppercase[i] = locationUppercase[i][0].toUpperCase() + locationUppercase[i].substr(1);
-    }
-
-    location = locationUppercase.join(" ");
+app.get('/query3Graph/:startingYear/:endingYear/:region', async (req, res) => {
+    let { startingYear, endingYear, region } = req.params;
 
     let stmt = `SELECT dp - jp, j.year 
     FROM 
         (SELECT AVG(r.price) AS jp, r.year 
         FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
-        WHERE c.region='${location}' AND r.month='Jan' 
+        WHERE c.region='${region}' AND r.month='Jan' 
         GROUP BY r.year) j, 
         (SELECT AVG(r.price) AS dp, r.year 
         FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
-        WHERE c.region='${location}' AND r.month='Dec' 
+        WHERE c.region='${region}' AND r.month='Dec' 
         GROUP BY r.year) d 
     WHERE j.year = d.year AND j.year BETWEEN ${startingYear} AND ${endingYear} 
     ORDER BY j.year`;
@@ -249,7 +232,7 @@ app.get('/query3Graph/:startingYear/:endingYear/:location', async (req, res) => 
             change.push(regionInfo.rows[i][0]);
         }
 
-        res.render('query3Graph', { location, years, change });
+        res.render('query3Graph', { region, years, change });
     }
 })
 
@@ -258,12 +241,6 @@ app.get('/query4', (req, res) => {
 })
 
 app.post('/query4', (req, res) => {
-    if (!req.body.city) {
-        req.flash('error', 'Must enter a location');
-        res.redirect('/query4');
-        return;
-    }
-
     if (req.body.startingYear > req.body.endingYear ||
         req.body.startingYear == req.body.endingYear) {
         req.flash('error', 'Starting year must be before ending year');
@@ -271,48 +248,64 @@ app.post('/query4', (req, res) => {
         return;
     }
 
-    res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.city}/${req.body.state}`);
+    res.redirect(`query4Graph/${req.body.startingYear}/${req.body.endingYear}/${req.body.state}`);
 })
 
-app.get('/query4Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
-    let { startingYear, endingYear, city, state } = req.params;
+app.get('/query4Graph/:startingYear/:endingYear/:state', async (req, res) => {
+    let { startingYear, endingYear, state } = req.params;
 
-    const cityUppercase = city.split(" ");
+    let stmt = `SELECT avg_price2 - avg_price1, city1, city2, yr1 
+    FROM
+        (SELECT AVG(r1.price) AS avg_price1, r1.year AS yr1, c1.city_name AS city1 
+        FROM maryrankin.city c1 NATURAL JOIN maryrankin.rent r1 
+        WHERE city_code =
+            (SELECT cheapest
+            FROM
+                (SELECT AVG(price) AS avg, city_code AS cheapest 
+                FROM maryrankin.rent NATURAL JOIN maryrankin.city
+                WHERE year BETWEEN ${startingYear} AND ${endingYear} AND cstate='${state}'
+                GROUP BY city_code
+                ORDER BY avg ASC
+                FETCH FIRST 1 ROWS ONLY)
+            )
+        GROUP BY r1.year, c1.city_name
+        ORDER BY r1.year ASC),
+        (SELECT AVG(r2.price) AS avg_price2, r2.year yr2, c2.city_name city2 
+        FROM maryrankin.city c2 NATURAL JOIN maryrankin.rent r2 
+        WHERE city_code =
+            (SELECT most_expensive
+            FROM
+                (SELECT AVG(price) AS avg, city_code AS most_expensive 
+                FROM maryrankin.rent NATURAL JOIN maryrankin.city
+                WHERE year BETWEEN ${startingYear} AND ${endingYear} AND cstate='${state}'
+                GROUP BY city_code
+                ORDER BY avg DESC
+                FETCH FIRST 1 ROWS ONLY)
+            )
+        GROUP BY r2.year, c2.city_name
+        ORDER BY r2.year ASC)
+    WHERE yr1 = yr2 AND yr1 BETWEEN ${startingYear} AND ${endingYear}`;
 
-    for (let i = 0; i < cityUppercase.length; i++) {
-        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
-    }
-
-    city = cityUppercase.join(" ");
-
-    let stmt = `SELECT AVG(r.price), r.month 
-    FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
-    WHERE c.city_name='${city}' AND c.cstate='${state}' AND r.year BETWEEN ${startingYear} AND ${endingYear} 
-    GROUP BY r.month 
-    ORDER BY r.month ASC`;
-
-    let cityInfo = await connection.execute(stmt);
+    let stateInfo = await connection.execute(stmt);
     
-    if (cityInfo.rows[0] === undefined) {
-        req.flash('error', 'City or Years Not Found');
+    if (stateInfo.rows[0] === undefined) {
+        req.flash('error', 'Data for These Years Not Found');
         res.redirect('/query4');
         return;
     }
     else {
-        const months = [];
-        const avgRent = [];
+        const years = [];
+        const rentDiff = [];
+        let cheapestCity = stateInfo.rows[0][1];
+        cheapestCity = cheapestCity.replace('\'', '');
+        let mostExpensiveCity = stateInfo.rows[0][2];
 
-        for (let i = 0; i < cityInfo.rows.length; i++) {
-            months.push(cityInfo.rows[i][1]);
-            avgRent.push(cityInfo.rows[i][0]);
+        for (let i = 0; i < stateInfo.rows.length; i++) {
+            years.push(stateInfo.rows[i][3]);
+            rentDiff.push(stateInfo.rows[i][0]);
         }
 
-        const monthsAndRent = [months, avgRent];
-        const monthsAndRentInOrder = orderMonths(monthsAndRent);
-        const monthsInOrder = monthsAndRentInOrder[0];
-        const avgRentInOrder = monthsAndRentInOrder[1];
-
-        res.render('query4Graph', { city, state, monthsInOrder, avgRentInOrder, startingYear, endingYear });
+        res.render('query4Graph', { state, cheapestCity, mostExpensiveCity, years, rentDiff, startingYear, endingYear });
     }
 })
 

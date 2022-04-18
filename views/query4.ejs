@@ -15,9 +15,9 @@
             <div class="col-4 d-flex justify-content-center">
                 <div class="card query-selectors">
                     <div class="card-body">
-                        <h5 class="card-title text-center">Typical Monthly Trends by City</h5>
-                        <p class="card-text">Search by city to view a line graph of how average rent price tends to
-                            change throughout the year.</p>
+                        <h5 class="card-title text-center">Difference in Most and Least Expensive Cities by State</h5>
+                        <p class="card-text">Search by state to view a line graph of the difference in average rent
+                            price between the most and least expensive cities in that state over a range of years.</p>
 
                         <form action="/query4" method="POST">
                             <div class="mb-3">
@@ -47,11 +47,6 @@
                                     <option value="2016">2016</option>
                                     <option value="2017">2017</option>
                                 </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control" id="city" name="city" aria-describedby="city">
                             </div>
 
                             <div class="mb-3">

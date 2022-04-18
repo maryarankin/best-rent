@@ -6,13 +6,13 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            let monthsArray = '<%= monthsInOrder %>'.split(',');
-            let dataArray = '<%= avgRentInOrder %>'.split(',');
+            let yearsArray = '<%= years %>'.split(',');
+            let dataArray = '<%= rentDiff %>'.split(',');
 
             const data = {
-                labels: monthsArray,
+                labels: yearsArray,
                 datasets: [{
-                    label: '<%= city %>',
+                    label: '<%= mostExpensiveCity %> - <%= cheapestCity %>',
                     backgroundColor: 'rgb(0, 106, 255)',
                     borderColor: 'rgb(0, 106, 255)',
                     data: dataArray,
@@ -26,7 +26,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Typical Monthly Trends in <%= city %>, <%= state %> from <%= startingYear %> to <%= endingYear %>'
+                            text: 'Average Difference in Most Expensive (<%= mostExpensiveCity %>) and Least Expensive (<%= cheapestCity %>) Cities in <%= state %> from <%= startingYear %> to <%= endingYear %>'
                         },
                         legend: {
                             display: false
@@ -36,13 +36,13 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Month (Combined from <%= startingYear %> to <%= endingYear %>)'
+                                text: 'Year'
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Average Rent Price'
+                                text: 'Average Difference in Rent Price'
                             }
                         }
                     }
