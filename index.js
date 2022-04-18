@@ -275,8 +275,8 @@ app.get('/query4Graph/:startingYear/:endingYear/:state', async (req, res) => {
                 ORDER BY avg ASC
                 FETCH FIRST 1 ROWS ONLY)
             )
-        GROUP BY r1.year, c1.city_name
-        ORDER BY r1.year ASC),
+        GROUP BY yr1, city1
+        ORDER BY yr1 ASC),
         (SELECT AVG(r2.price) AS avg_price2, r2.year yr2, c2.city_name city2 
         FROM maryrankin.city c2 NATURAL JOIN maryrankin.rent r2 
         WHERE city_code =
@@ -289,8 +289,8 @@ app.get('/query4Graph/:startingYear/:endingYear/:state', async (req, res) => {
                 ORDER BY avg DESC
                 FETCH FIRST 1 ROWS ONLY)
             )
-        GROUP BY r2.year, c2.city_name
-        ORDER BY r2.year ASC)
+        GROUP BY yr2, city2
+        ORDER BY yr2 ASC)
     WHERE yr1 = yr2 AND yr1 BETWEEN ${startingYear} AND ${endingYear}`;
 
     let stateInfo = await connection.execute(stmt);
@@ -409,7 +409,7 @@ app.get('/query6Graph/:startingYear/:endingYear/:city/:state', async (req, res) 
         WHERE avg_price1 <= avg_price2 AND c1_county = c2_county
         ORDER BY avg_price1 ASC
         FETCH FIRST 1 ROWS ONLY)
-    AND r.year BETWEEN 2010 and 2017
+    AND r.year BETWEEN ${startingYear} and ${endingYear}
     GROUP BY r.year, c.city_name, c.county
     ORDER BY r.year ASC`;
 
