@@ -62,6 +62,16 @@ async function run() {
 
 run();
 
+const changeCapitalization = (cityName) => {
+    const cityUppercase = cityName.split(" ");
+
+    for (let i = 0; i < cityUppercase.length; i++) {
+        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1).toLowerCase();
+    }
+
+    return cityUppercase.join(" ");
+}
+
 app.get('/', (req, res) => {
     res.render('home');
 })
@@ -71,7 +81,14 @@ app.get('/complexqueries', (req, res) => {
 })
 
 app.get('/numtuples', async (req, res) => {
-    let stmt = `SELECT c_count + r_count + rpsf_count FROM (SELECT COUNT(*) AS c_count FROM maryrankin.city), (SELECT COUNT(*) AS r_count FROM maryrankin.rent), (SELECT COUNT(*) AS rpsf_count FROM maryrankin.rent_per_sq_ft)`;
+    let stmt = `SELECT c_count + r_count + rpsf_count 
+    FROM 
+        (SELECT COUNT(*) AS c_count 
+        FROM maryrankin.city), 
+        (SELECT COUNT(*) AS r_count 
+        FROM maryrankin.rent), 
+        (SELECT COUNT(*) AS rpsf_count 
+        FROM maryrankin.rent_per_sq_ft)`;
 
     let numTuplesInfo = await connection.execute(stmt);
     let numTuples = numTuplesInfo.rows[0][0];
@@ -105,13 +122,7 @@ app.post('/query1', (req, res) => {
 app.get('/query1Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
     let { startingYear, endingYear, city, state } = req.params;
 
-    const cityUppercase = city.split(" ");
-
-    for (let i = 0; i < cityUppercase.length; i++) {
-        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
-    }
-
-    city = cityUppercase.join(" ");
+    city = changeCapitalization(city);
 
     let stmt = `SELECT AVG(r.price), r.year 
     FROM maryrankin.rent r NATURAL JOIN maryrankin.city c 
@@ -333,13 +344,7 @@ app.post('/query5', (req, res) => {
 app.get('/query5Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
     let { startingYear, endingYear, city, state } = req.params;
 
-    const cityUppercase = city.split(" ");
-
-    for (let i = 0; i < cityUppercase.length; i++) {
-        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
-    }
-
-    city = cityUppercase.join(" ");
+    city = changeCapitalization(city);
 
     let stmt = `SELECT AVG(r.price / rpsf.price), r.year 
     FROM maryrankin.rent_per_sq_ft rpsf, maryrankin.rent r, maryrankin.city c 
@@ -392,13 +397,7 @@ app.post('/query6', (req, res) => {
 app.get('/query6Graph/:startingYear/:endingYear/:city/:state', async (req, res) => {
     let { startingYear, endingYear, city, state } = req.params;
 
-    const cityUppercase = city.split(" ");
-
-    for (let i = 0; i < cityUppercase.length; i++) {
-        cityUppercase[i] = cityUppercase[i][0].toUpperCase() + cityUppercase[i].substr(1);
-    }
-
-    city = cityUppercase.join(" ");
+    city = changeCapitalization(city);
 
     let stmt = `SELECT AVG(r.price), r.year, c.city_name, c.county
     FROM maryrankin.rent r NATURAL JOIN maryrankin.city c

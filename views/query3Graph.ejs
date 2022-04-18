@@ -12,7 +12,7 @@
             const data = {
                 labels: yearsArray,
                 datasets: [{
-                    label: '<%= location %>',
+                    label: '<%= region %>',
                     backgroundColor: 'rgb(0, 106, 255)',
                     borderColor: 'rgb(0, 106, 255)',
                     data: dataArray,
@@ -26,7 +26,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Yearly Change in Rent Price in <%= location %> Region'
+                            text: 'Yearly Change in Rent Price in <%= region %> Region'
                         },
                         legend: {
                             display: false
